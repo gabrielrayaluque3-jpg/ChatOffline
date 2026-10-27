@@ -11,7 +11,20 @@ public class GestorChat {
 
     // TODO Fase 1: comprobar duplicados y registrar el usuario en XML.
     public void registrarUsuario(String nombre) throws JAXBException {
-        throw new UnsupportedOperationException("Pendiente: registrarUsuario");
+        if (nombre == null || nombre.isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacío.");
+        }
+        ListaUsuarios lista = gestorXML.leerUsuarios();
+        if (existeUsuario(lista, nombre)) {
+            throw new IllegalArgumentException("El usuario " + nombre + " ya existe.");
+        }
+        lista.getUsuarios().add(new Usuario(nombre));
+        gestorXML.guardarUsuarios(lista);
+    }
+
+    private boolean existeUsuario(ListaUsuarios lista, String nombre) {
+        return lista.getUsuarios().stream()
+                .anyMatch(u -> u.getNombre().equalsIgnoreCase(nombre));
     }
 
     // TODO Fase 2: validar usuarios, crear mensaje con fecha y persistirlo.
