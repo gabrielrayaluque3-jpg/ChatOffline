@@ -26,7 +26,7 @@ public class GestorXML {
     // TODO Fase 1: guardar usuarios.xml usando JAXB (Marshaller).
     public void guardarUsuarios(ListaUsuarios usuarios) throws JAXBException {
         guardar(usuarios, archivoUsuarios);
-        throw new UnsupportedOperationException("Pendiente: guardarUsuarios");
+
     }
 
     // TODO Fase 1: recuperar usuarios.xml usando JAXB (Unmarshaller).
@@ -40,7 +40,7 @@ public class GestorXML {
     // TODO Fase 2: guardar mensajes.xml usando JAXB.
     public void guardarMensajes(ListaMensajes mensajes) throws JAXBException {
         guardar(mensajes, archivoMensajes);
-        throw new UnsupportedOperationException("Pendiente: guardarMensajes");
+
     }
 
     // TODO Fase 2: recuperar mensajes.xml usando JAXB.
@@ -50,7 +50,7 @@ public class GestorXML {
         if (lista.getMensajes() == null) lista.setMensajes(new ArrayList<>());
         return lista;
 
-        //throw new UnsupportedOperationException("Pendiente: leerMensajes");
+
     }
     private void guardar(Object objeto, Path destino) throws JAXBException {
         JAXBContext contexto = JAXBContext.newInstance(objeto.getClass());
