@@ -3,6 +3,9 @@ package es.iesfranciscodelosrios.chat;
 import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +32,26 @@ public class GestorChat {
 
     // TODO Fase 2: validar usuarios, crear mensaje con fecha y persistirlo.
     public void enviarMensaje(String emisor, String destinatario, String contenido) throws JAXBException {
-        throw new UnsupportedOperationException("Pendiente: enviarMensaje");
+        if(emisor==null||destinatario==null||contenido==null||contenido.isEmpty()){
+            throw new IllegalArgumentException("Emisor, destinatario y contenido son obligatorios.");
+        }
+        ListaUsuarios usuarios = gestorXML.leerUsuarios();
+        if(!existeUsuario(usuarios,emisor)){
+            throw new IllegalArgumentException("El emisor "+emisor+ "no existe.");
+        }
+        if(!existeUsuario(usuarios,destinatario)){
+            throw new IllegalArgumentException("El destinatario  "+destinatario+ "no existe.");
+        }
+        String fecha = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        Mensaje mensaje = new Mensaje(emisor,destinatario,contenido,fecha);
+        ListaMensajes mensajes = gestorXML.leerMensajes();
+        mensajes.getMensajes().add(mensaje);
+        gestorXML.guardarMensajes(mensajes);
     }
 
     // TODO Fase 3: filtrar mensajes en ambos sentidos (A -> B y B -> A).
     public List<Mensaje> consultarConversacion(String usuarioA, String usuarioB) throws JAXBException {
+
         throw new UnsupportedOperationException("Pendiente: consultarConversacion");
     }
 

@@ -8,6 +8,7 @@ import jakarta.xml.bind.Unmarshaller;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.function.Supplier;
 
 public class GestorXML {
@@ -32,7 +33,7 @@ public class GestorXML {
     // Si no existe el archivo, devolver una ListaUsuarios vacía.
     public ListaUsuarios leerUsuarios() throws JAXBException {
         ListaUsuarios lista = leer(archivoUsuarios, ListaUsuarios.class, ListaUsuarios::new);
-        if (lista.getUsuarios() == null) lista.setUsuarios(new java.util.ArrayList<>());
+        if (lista.getUsuarios() == null) lista.setUsuarios(new ArrayList<>());
         return lista;
     }
 
@@ -46,7 +47,7 @@ public class GestorXML {
     // Si no existe el archivo, devolver una ListaMensajes vacía.
     public ListaMensajes leerMensajes() throws JAXBException {
         ListaMensajes lista = leer(archivoMensajes, ListaMensajes.class, ListaMensajes::new);
-        if (lista.getMensajes() == null) lista.setMensajes(new java.util.ArrayList<>());
+        if (lista.getMensajes() == null) lista.setMensajes(new ArrayList<>());
         return lista;
 
         //throw new UnsupportedOperationException("Pendiente: leerMensajes");
