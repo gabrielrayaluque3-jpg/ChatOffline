@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,8 +52,29 @@ public class GestorChat {
 
     // TODO Fase 3: filtrar mensajes en ambos sentidos (A -> B y B -> A).
     public List<Mensaje> consultarConversacion(String usuarioA, String usuarioB) throws JAXBException {
+        if(usuarioA==null||usuarioB==null){
+            throw new IllegalArgumentException("Introduce los usuarios.");
+        }
+        ListaUsuarios usuarios = gestorXML.leerUsuarios();
+        if(!existeUsuario(usuarios,usuarioA)){
+            throw new IllegalArgumentException("El usuario "+usuarioA+" no existe");
+        }
+        if(!existeUsuario(usuarios,usuarioB)){
+            throw new IllegalArgumentException("El usuario "+usuarioB+" no existe");
+        }
+        List<Mensaje> mensajes = gestorXML.leerMensajes().getMensajes();
+        List<Mensaje> conversacion = new ArrayList<>();
+        for(Mensaje mensaje : mensajes){
+            boolean deAaB = false;
+            boolean deBaA = false;
+            if(mensaje.getEmisor().equalsIgnoreCase(usuarioA)&&mensaje.getDestinatario().equalsIgnoreCase(usuarioB)) deAaB=true;
+            if(mensaje.getEmisor().equalsIgnoreCase(usuarioB)&&mensaje.getDestinatario().equalsIgnoreCase(usuarioA)) deBaA=true;
+            if (deAaB || deBaA){
+                conversacion.add(mensaje);
+            }
 
-        throw new UnsupportedOperationException("Pendiente: consultarConversacion");
+        }
+        return conversacion;
     }
 
     // TODO Fase 4: utilizar Stream API para contar mensajes por emisor.
