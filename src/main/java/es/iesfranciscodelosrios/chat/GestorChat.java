@@ -1,7 +1,12 @@
 package es.iesfranciscodelosrios.chat;
 
 import jakarta.xml.bind.JAXBException;
+
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,6 +17,10 @@ import java.util.Map;
 
 public class GestorChat {
     private final GestorXML gestorXML = new GestorXML();
+    private static final Path CARPETA_MEDIA = Path.of("media");
+    private static final long TAMANO_MAXIMO = 5L * 1024 * 1024; // 5 MB
+    private static final List<String> EXTENSIONES_PERMITIDAS =
+            List.of("jpg", "jpeg", "png", "gif", "pdf", "txt", "mp3", "mp4", "zip");
 
     // TODO Fase 1: comprobar duplicados y registrar el usuario en XML.
     public void registrarUsuario(String nombre) throws JAXBException {
@@ -83,14 +92,80 @@ public class GestorChat {
     }
 
     // TODO Fase 4: exportar la conversación a un archivo de texto.
-    public void exportarConversacion(String usuarioA, String usuarioB, Path destino)
-            throws JAXBException, IOException {
-        throw new UnsupportedOperationException("Pendiente: exportarConversacion");
+    public void exportarConversacion(String usuarioA, String usuarioB, Path destino) throws JAXBException, IOException {
+        List<Mensaje> conversacion = consultarConversacion(usuarioA, usuarioB);
+        if (destino.getParent() != null) {
+            Files.createDirectory(destino.getParent());
+        }
+
+        try (BufferedWriter escritor = Files.newBufferedWriter(destino)) {
+            escritor.write("Conversación entre " + usuarioA + " y " + usuarioB);
+            escritor.write("----------------------------------------");
+
+            for (Mensaje m : conversacion) {
+                escritor.write(m.getFecha() + "Emisor: "+m.getEmisor()+" Receptor: "+m.getDestinatario() + ": " + m.getContenido());
+            }
+        }
     }
 
     // TODO Fase 5: validar extensión/tamaño, copiar con InputStream/OutputStream
     // a media/ y guardar los metadatos del adjunto en el mensaje XML.
     public void adjuntarArchivo(Mensaje mensaje, Path archivoOrigen) throws IOException, JAXBException {
-        throw new UnsupportedOperationException("Pendiente: adjuntarArchivo");
+        // 1. Validar el archivo
+        if (!Files.isRegularFile(archivoOrigen)) {
+            throw new IllegalArgumentException("El archivo no existe: " + archivoOrigen);
+        }
+
+        String nombre = archivoOrigen.getFileName().toString();
+        int punto = nombre.lastIndexOf('.');
+        String extension = punto >= 0 ? nombre.substring(punto + 1).toLowerCase() : "";
+        if (!EXTENSIONES_PERMITIDAS.contains(extension)) {
+            throw new IllegalArgumentException("Extensión no permitida. Permitidas: " + EXTENSIONES_PERMITIDAS);
+        }
+
+        long tamano = Files.size(archivoOrigen);
+        if (tamano > TAMANO_MAXIMO) {
+            throw new IllegalArgumentException("El archivo supera el máximo de 5 MB.");
+        }
+
+        // 2. Validar los usuarios del mensaje
+        ListaUsuarios usuarios = gestorXML.leerUsuarios();
+        if (!existeUsuario(usuarios, mensaje.getEmisor())
+                || !existeUsuario(usuarios, mensaje.getDestinatario())) {
+            throw new IllegalArgumentException("Emisor o destinatario no registrados.");
+        }
+
+        // 3. Copiar el archivo a media/ con InputStream y OutputStream
+        Files.createDirectories(CARPETA_MEDIA);
+        Path destino = CARPETA_MEDIA.resolve(System.currentTimeMillis() + "_" + nombre);
+
+        try (InputStream entrada = Files.newInputStream(archivoOrigen);
+             OutputStream salida = Files.newOutputStream(destino)) {
+            byte[] buffer = new byte[8192];
+            int leidos;
+            while ((leidos = entrada.read(buffer)) != -1) {
+                salida.write(buffer, 0, leidos);
+            }
+        }
+
+        // 4. Rellenar los datos del adjunto en el mensaje
+        String tipo = Files.probeContentType(archivoOrigen);
+        mensaje.setAdjuntoRuta(destino.toString());
+        mensaje.setAdjuntoNombre(nombre);
+        mensaje.setAdjuntoTamano(tamano);
+        mensaje.setAdjuntoTipo(tipo != null ? tipo : "application/octet-stream");
+
+        if (mensaje.getFecha() == null) {
+            mensaje.setFecha(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
+                    .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        }
+        if (mensaje.getContenido() == null) {
+            mensaje.setContenido("");
+        }
+
+        // 5. Guardar en el XML
+        ListaMensajes lista = gestorXML.leerMensajes();
+        lista.getMensajes().add(mensaje);
+        gestorXML.guardarMensajes(lista);
     }
 }
