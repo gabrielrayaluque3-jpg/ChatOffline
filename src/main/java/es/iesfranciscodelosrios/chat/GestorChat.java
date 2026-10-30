@@ -47,10 +47,10 @@ public class GestorChat {
         }
         ListaUsuarios usuarios = gestorXML.leerUsuarios();
         if(!existeUsuario(usuarios,emisor)){
-            throw new IllegalArgumentException("El emisor "+emisor+ "no existe.");
+            throw new IllegalArgumentException("El emisor "+emisor+ " no existe.");
         }
         if(!existeUsuario(usuarios,destinatario)){
-            throw new IllegalArgumentException("El destinatario  "+destinatario+ "no existe.");
+            throw new IllegalArgumentException("El destinatario  "+destinatario+ " no existe.");
         }
         String fecha = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         Mensaje mensaje = new Mensaje(emisor,destinatario,contenido,fecha);
@@ -81,7 +81,6 @@ public class GestorChat {
             if (deAaB || deBaA){
                 conversacion.add(mensaje);
             }
-
         }
         return conversacion;
     }

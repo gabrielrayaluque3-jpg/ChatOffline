@@ -49,8 +49,6 @@ public class GestorXML {
         ListaMensajes lista = leer(archivoMensajes, ListaMensajes.class, ListaMensajes::new);
         if (lista.getMensajes() == null) lista.setMensajes(new ArrayList<>());
         return lista;
-
-
     }
     private void guardar(Object objeto, Path destino) throws JAXBException {
         JAXBContext contexto = JAXBContext.newInstance(objeto.getClass());

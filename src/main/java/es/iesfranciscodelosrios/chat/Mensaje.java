@@ -39,4 +39,14 @@ public class Mensaje {
     public void setAdjuntoTamano(long adjuntoTamano) { this.adjuntoTamano = adjuntoTamano; }
     public String getAdjuntoTipo() { return adjuntoTipo; }
     public void setAdjuntoTipo(String adjuntoTipo) { this.adjuntoTipo = adjuntoTipo; }
+
+    @Override
+    public String toString() {
+        return "Mensaje{" +
+                "emisor='" + emisor + '\'' +
+                ", destinatario='" + destinatario + '\'' +
+                ", contenido='" + contenido + '\'' +
+                ", fecha='" + fecha + '\'' +
+                '}';
+    }
 }
