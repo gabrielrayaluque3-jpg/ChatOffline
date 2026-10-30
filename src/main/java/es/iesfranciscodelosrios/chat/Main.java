@@ -2,11 +2,14 @@ package es.iesfranciscodelosrios.chat;
 
 import jakarta.xml.bind.JAXBException;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws JAXBException {
+    public static void main(String[] args) throws JAXBException, IOException {
         Scanner sc = new Scanner(System.in);
         GestorChat chat = new GestorChat();
         int op = 0;
@@ -20,6 +23,7 @@ public class Main {
                     "5. Exportar conversación\n" +
                     "6. Adjuntar archivo\n" +
                     "0. Salir");
+
             System.out.print("Introduce una opción: ");
             op = sc.nextInt();
             String emisor = " ";
@@ -39,15 +43,16 @@ public class Main {
                     System.out.print("Nombre del destinatario: ");
                     destinatario = sc.next();
                     System.out.print("Contenido del mensaje: ");
-                    String contenido = sc.next();
+                    sc.nextLine();
+                    String contenido = sc.nextLine();
                     chat.enviarMensaje(emisor,destinatario,contenido);
                     System.out.println("Mensaje enviado con éxito.");
                 break;
                 case 3 :
                     System.out.println("\t--- CONSULTAR CONVERSACIÓN ---");
-                    System.out.print("Nombre del emisor: ");
+                    System.out.print("Nombre de un usuario: ");
                     String usuarioA = sc.next();
-                    System.out.print("Nombre del destinatario: ");
+                    System.out.print("Nombre de otro usuario: ");
                     String usuarioB = sc.next();
                     List<Mensaje> mensajes = chat.consultarConversacion(usuarioA,usuarioB);
                     for (Mensaje m : mensajes){
@@ -56,12 +61,21 @@ public class Main {
                 break;
                 case 4 :
                     System.out.println("\t--- ESTADÍSTICAS ---");
+                    System.out.println("Próximamente...");
                 break;
                 case 5 :
                     System.out.println("\t--- EXPORTAR CONVERSACIÓN ---");
+                    System.out.print("Nombre de un usuario: ");
+                    String usuario1 = sc.next();
+                    System.out.print("Nombre de otro usuario: ");
+                    String usuario2 = sc.next();
+                    System.out.print("Nombre del archivo: ");
+                    Path archivo = Paths.get(sc.next());
+                    chat.exportarConversacion(usuario1,usuario2,archivo);
                 break;
                 case 6 :
                     System.out.println("\t--- ADJUNTAR ARCHIVO ---");
+                    System.out.println("Próximamente...");
                 break;
                 case 0 :
                     System.out.println("Saliendo del programa...");
